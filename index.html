@@ -77,6 +77,20 @@
     </div>
 
     <div class="settings">
+      <div class="field field-stacked">
+        <span class="field-label" id="groove-label">Drum groove</span>
+        <p class="groove-about" id="groove-name">Metronome click only</p>
+        <!-- Filled in by script.js from the GROOVES list -->
+        <div id="grooves" class="grooves" role="radiogroup" aria-labelledby="groove-label"></div>
+        <div class="groove-extras">
+          <label class="check" id="groove-click-row" hidden>
+            <input type="checkbox" id="groove-click">
+            Play the click with the groove
+          </label>
+          <button type="button" id="groove-tempo" class="text-button" hidden></button>
+        </div>
+      </div>
+
       <div class="field">
         <span class="field-label" id="beats-label">Beats per bar</span>
         <div class="stepper" role="group" aria-labelledby="beats-label">

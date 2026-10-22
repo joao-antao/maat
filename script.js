@@ -66,6 +66,169 @@
   const subById = (id) => SUBDIVISIONS.find((s) => s.id === id) || SUBDIVISIONS[0];
   const LEGACY_SUBS = { 1: 'quarter', 2: 'eighths', 3: 'triplets', 4: 'sixteenths' };
 
+  /*
+   * Drum grooves. Each drum gets a step grid, one character per step:
+   *   X = loud, x = normal, g = ghost note (very soft), . = rest
+   * The | marks the beats and is only there for readability.
+   * steps: 4 = sixteenth-note grid, 3 = triplet grid (for swing and shuffle).
+   * swing: on a sixteenth grid, delays every second sixteenth by this
+   *        fraction of a beat, for a laid-back feel.
+   * A drum's grid can be one bar or several; shorter grids simply repeat.
+   * To add a groove, add an entry here; it appears in the list automatically.
+   * Drums: kick, snare, rim (cross-stick), hat, open (open hi-hat), ride, crash.
+   */
+  const GROOVES = [
+    {
+      id: 'rock', name: 'Rock', about: 'Straight eighths, backbeat on 2 and 4',
+      beats: 4, steps: 4,
+      parts: {
+        hat:   'X.x.|X.x.|X.x.|X.x.',
+        snare: '....|X...|....|X...',
+        kick:  'X...|....|X.x.|....',
+      },
+    },
+    {
+      id: 'pop', name: 'Pop', tempo: 108,
+      about: 'Steady eighths with a pushed kick and an open hi-hat lift',
+      beats: 4, steps: 4,
+      parts: {
+        hat:   'X.x.|X.x.|X.x.|X.x.|X.x.|X.x.|X.x.|X...',
+        open:  '....|....|....|....|....|....|....|..x.',
+        snare: '....|X...|....|X...',
+        kick:  'X...|..x.|X...|....|X...|..x.|X.x.|..x.',
+      },
+    },
+    {
+      id: 'shuffle', name: 'Shuffle', about: 'Blues shuffle on a triplet feel',
+      beats: 4, steps: 3,
+      parts: {
+        hat:   'X.x|X.x|X.x|X.x',
+        snare: '...|X..|...|X..',
+        kick:  'X..|..x|X..|...',
+      },
+    },
+    {
+      id: 'funk', name: 'Funk', about: 'Syncopated kick and ghost notes on the snare',
+      beats: 4, steps: 4, swing: 0.02,
+      parts: {
+        hat:   'x.x.|x.x.|x.x.|x...',
+        open:  '....|....|....|..x.',
+        snare: '....|X..g|.g..|X..g',
+        kick:  'X.x.|....|..x.|.x..',
+      },
+    },
+    {
+      // Sixteenths on the hi-hat with one hand, accenting the eighth notes; a linear
+      // kick/cross-stick figure (never both on the same sixteenth); a barely-there
+      // swing; and an open hi-hat at the end of the second bar.
+      id: 'funk-2bar', name: 'Funk 2-bar phrase', tempo: 78,
+      about: 'Linear kick and cross-stick under sixteenth hi-hats, over two bars',
+      beats: 4, steps: 4, swing: 0.015,
+      parts: {
+        hat:  'XgXg|XgXg|XgXg|XgXg|XgXg|XgXg|XgXg|Xg.g',
+        open: '....|....|....|....|....|....|....|..X.',
+        rim:  '....|X..g|....|X.g.|....|X..g|...g|X..g',
+        kick: 'X..x|..x.|X.x.|...x|X..x|..x.|X.x.|.x..',
+      },
+    },
+    {
+      id: 'jazz', name: 'Jazz swing', about: 'Ride cymbal swing, hi-hat on 2 and 4',
+      beats: 4, steps: 3,
+      parts: {
+        ride:  'X..|x.x|X..|x.x',
+        hat:   '...|x..|...|x..',
+        kick:  'g..|g..|g..|g..',
+        snare: '...|...|..g|...|...|..g|...|g..',
+      },
+    },
+    {
+      id: 'waltz', name: 'Jazz waltz', about: 'Swing in three',
+      beats: 3, steps: 3,
+      parts: {
+        ride:  'X..|x.x|x..',
+        hat:   '...|x..|x..',
+        kick:  'g..|...|...',
+        snare: '...|...|..g|...|..g|...',
+      },
+    },
+    {
+      id: 'hiphop', name: 'Hip-hop', about: 'Boom bap with a lazy sixteenth swing',
+      beats: 4, steps: 4, swing: 0.07,
+      parts: {
+        hat:   'X.x.|X.x.|X.x.|X.x.',
+        snare: '....|X...|....|X...',
+        kick:  'X...|...x|..x.|....|X...|...x|..x.|.x..',
+      },
+    },
+    {
+      id: 'metal', name: 'Metal', about: 'Double-bass sixteenths under a heavy backbeat',
+      beats: 4, steps: 4,
+      parts: {
+        crash: 'X...|....|....|....|....|....|....|....',
+        ride:  'x.x.|x.x.|x.x.|x.x.',
+        snare: '....|X...|....|X...',
+        kick:  'xxxx|xxxx|xxxx|xxxx',
+      },
+    },
+    {
+      id: 'disco', name: 'Disco', about: 'Four on the floor, open hi-hat on the offbeats',
+      beats: 4, steps: 4,
+      parts: {
+        hat:   'x...|x...|x...|x...',
+        open:  '..x.|..x.|..x.|..x.',
+        snare: '....|X...|....|X...',
+        kick:  'X...|X...|X...|X...',
+      },
+    },
+    {
+      id: 'reggae', name: 'Reggae', about: 'One drop: kick and cross-stick together on 3',
+      beats: 4, steps: 3,
+      parts: {
+        hat:   'x.x|x.x|x.x|x.x',
+        rim:   '...|...|X..|...',
+        kick:  '...|...|X..|...',
+      },
+    },
+    {
+      // Classic 1970s Afrobeat in the Tony Allen tradition: busy sixteenth
+      // hi-hats with open accents, a kick that dances around the beat, and
+      // ghost notes surrounding the snare (kick and snare never coincide).
+      id: 'afrobeat', name: 'Afrobeat', tempo: 112,
+      about: 'Busy hi-hats, a dancing kick and ghost notes around the backbeat',
+      beats: 4, steps: 4, swing: 0.03,
+      parts: {
+        hat:   'X.xx|X..x|X.xx|X..x',
+        open:  '....|..x.|....|..x.',
+        snare: '..g.|X..g|..g.|X.g.',
+        kick:  'X...|..x.|.x..|.x..|X...|..x.|.x..|...x',
+      },
+    },
+    {
+      id: 'bossa', name: 'Bossa nova', about: 'Cross-stick clave over a steady bass drum',
+      beats: 4, steps: 4,
+      parts: {
+        hat:   'x.x.|x.x.|x.x.|x.x.',
+        rim:   'X...|..X.|....|X...|....|X...|..X.|....',
+        kick:  'X..x|X..x|X..x|X..x',
+      },
+    },
+  ];
+
+  const VELOCITY = { X: 1, x: 0.65, g: 0.28 };
+  GROOVES.forEach((groove) => {
+    const barSteps = groove.beats * groove.steps;
+    groove.tracks = Object.entries(groove.parts).map(([drum, grid]) => {
+      const hits = [...grid.replace(/[|\s]/g, '')].map((c) => VELOCITY[c] || 0);
+      if (hits.length % barSteps) console.warn(`Groove "${groove.id}": the ${drum} part is not a whole number of bars.`);
+      return { drum, hits };
+    });
+    groove.bars = Math.ceil(Math.max(...groove.tracks.map((t) => t.hits.length)) / barSteps);
+    const swing = groove.steps === 4 ? groove.swing || 0 : 0;
+    groove.offsets = Array.from({ length: groove.steps }, (_, i) => i / groove.steps + (i % 2 ? swing : 0));
+  });
+
+  const grooveById = (id) => GROOVES.find((g) => g.id === id) || null;
+
   const $ = (id) => document.getElementById(id);
   const els = {
     arm: $('arm'),
@@ -81,6 +244,11 @@
     moreBeats: $('more-beats'),
     subs: $('subdivisions'),
     subName: $('sub-name'),
+    grooves: $('grooves'),
+    grooveName: $('groove-name'),
+    grooveClick: $('groove-click'),
+    grooveClickRow: $('groove-click-row'),
+    grooveTempo: $('groove-tempo'),
     volume: $('volume'),
     toggle: $('toggle'),
     tap: $('tap'),
@@ -102,7 +270,10 @@
   }
 
   function loadSettings() {
-    const defaults = { bpm: 100, beats: 4, sub: 'quarter', volume: 0.8, accents: defaultAccents(4) };
+    const defaults = {
+      bpm: 100, beats: 4, sub: 'quarter', volume: 0.8, accents: defaultAccents(4),
+      groove: 'off', clickWithGroove: false,
+    };
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
       if (!saved || typeof saved !== 'object') return defaults;
@@ -116,6 +287,8 @@
         accents: Array.isArray(saved.accents)
           ? resizeAccents(saved.accents, beats)
           : defaultAccents(beats),
+        groove: grooveById(saved.groove) ? saved.groove : 'off',
+        clickWithGroove: saved.clickWithGroove === true,
       };
     } catch {
       return defaults;
@@ -124,8 +297,10 @@
 
   function saveSettings() {
     try {
-      const { bpm, beats, sub, volume, accents } = state;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ bpm, beats, sub, volume, accents }));
+      const { bpm, beats, sub, volume, accents, groove, clickWithGroove } = state;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        bpm, beats, sub, volume, accents, groove, clickWithGroove,
+      }));
     } catch {
       /* Storage can be unavailable (private mode); settings just won't persist. */
     }
@@ -137,6 +312,7 @@
 
   let audioCtx = null;
   let masterGain = null;
+  let drumBus = null;
 
   function ensureAudio() {
     if (!audioCtx) {
@@ -145,6 +321,16 @@
       masterGain = audioCtx.createGain();
       masterGain.gain.value = state.volume;
       masterGain.connect(audioCtx.destination);
+
+      // Drums go through a gentle compressor so loud hits never clip.
+      const compressor = audioCtx.createDynamicsCompressor();
+      compressor.threshold.value = -16;
+      compressor.knee.value = 6;
+      compressor.ratio.value = 6;
+      compressor.attack.value = 0.002;
+      drumBus = audioCtx.createGain();
+      drumBus.gain.value = 0.62;
+      drumBus.connect(compressor).connect(masterGain);
     }
     if (audioCtx.state === 'suspended') audioCtx.resume();
   }
@@ -166,19 +352,125 @@
     osc.stop(time + 0.06);
   }
 
+  /* ---------- Drum kit (synthesised, no sound files) ---------- */
+
+  let noiseBuffer = null;
+  function getNoise() {
+    if (!noiseBuffer) {
+      const length = audioCtx.sampleRate;
+      noiseBuffer = audioCtx.createBuffer(1, length, audioCtx.sampleRate);
+      const data = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < length; i++) data[i] = Math.random() * 2 - 1;
+    }
+    return noiseBuffer;
+  }
+
+  function envelope(time, peak, decay) {
+    const env = audioCtx.createGain();
+    env.gain.setValueAtTime(0.0001, time);
+    env.gain.exponentialRampToValueAtTime(peak, time + 0.002);
+    env.gain.exponentialRampToValueAtTime(0.0001, time + decay);
+    return env;
+  }
+
+  // Filtered white noise: the body of snares, hats and cymbals.
+  function noise(time, { decay, type, freq, peak, q = 0.7 }) {
+    const src = audioCtx.createBufferSource();
+    src.buffer = getNoise();
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = type;
+    filter.frequency.value = freq;
+    filter.Q.value = q;
+    src.connect(filter).connect(envelope(time, peak, decay)).connect(drumBus);
+    src.start(time);
+    src.stop(time + decay + 0.05);
+  }
+
+  // A pitched tone, optionally sweeping down (kick drum, snare body).
+  function tone(time, { wave, from, to, sweep = 0, decay, peak }) {
+    const osc = audioCtx.createOscillator();
+    osc.type = wave;
+    osc.frequency.setValueAtTime(from, time);
+    if (to) osc.frequency.exponentialRampToValueAtTime(to, time + sweep);
+    osc.connect(envelope(time, peak, decay)).connect(drumBus);
+    osc.start(time);
+    osc.stop(time + decay + 0.05);
+  }
+
+  // Six detuned square waves, high-passed: the classic drum-machine metal sound.
+  const METAL_RATIOS = [2, 3, 4.16, 5.43, 6.79, 8.21];
+  function metal(time, { decay, peak, highpass }) {
+    const mix = audioCtx.createGain();
+    mix.gain.value = 1 / METAL_RATIOS.length;
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.value = highpass;
+    mix.connect(filter).connect(envelope(time, peak, decay)).connect(drumBus);
+    METAL_RATIOS.forEach((ratio) => {
+      const osc = audioCtx.createOscillator();
+      osc.type = 'square';
+      osc.frequency.value = 40 * ratio;
+      osc.connect(mix);
+      osc.start(time);
+      osc.stop(time + decay + 0.05);
+    });
+  }
+
+  const DRUMS = {
+    kick(t, v) {
+      tone(t, { wave: 'sine', from: 150, to: 45, sweep: 0.1, decay: 0.4, peak: v });
+    },
+    snare(t, v) {
+      noise(t, { decay: 0.18, type: 'highpass', freq: 1200, peak: v * 0.75 });
+      tone(t, { wave: 'triangle', from: 230, to: 170, sweep: 0.05, decay: 0.09, peak: v * 0.45 });
+    },
+    rim(t, v) {
+      tone(t, { wave: 'square', from: 1700, decay: 0.025, peak: v * 0.22 });
+      noise(t, { decay: 0.035, type: 'bandpass', freq: 2600, peak: v * 0.35, q: 2 });
+    },
+    hat(t, v) {
+      metal(t, { decay: 0.05, peak: v * 0.5, highpass: 7000 });
+    },
+    open(t, v) {
+      metal(t, { decay: 0.3, peak: v * 0.42, highpass: 7000 });
+    },
+    ride(t, v) {
+      metal(t, { decay: 0.65, peak: v * 0.75, highpass: 5000 });
+      noise(t, { decay: 0.25, type: 'highpass', freq: 8000, peak: v * 0.2 });
+    },
+    crash(t, v) {
+      noise(t, { decay: 1.4, type: 'highpass', freq: 4000, peak: v * 0.45 });
+      metal(t, { decay: 1.1, peak: v * 0.25, highpass: 5000 });
+    },
+  };
+
   /* ---------- Scheduler ---------- */
 
   let beatStartTime = 0;  // audio time at which the current beat starts
   let currentBeat = 0;    // position in the bar
   let noteIndex = 0;      // position in the subdivision rhythm
   let beatCount = 0;      // total beats since start; drives pendulum direction
+  let barNumber = 0;      // bars since start; picks the bar in multi-bar grooves
   const queue = [];       // beats scheduled but not yet drawn
   let lastBeat = null;
 
+  function playGrooveStep(groove, beat, index, time) {
+    const step = ((barNumber % groove.bars) * groove.beats + beat) * groove.steps + index;
+    for (const track of groove.tracks) {
+      const velocity = track.hits[step % track.hits.length];
+      if (velocity) DRUMS[track.drum](time, velocity);
+    }
+  }
+
   function scheduleNote(beat, index, time) {
     const accent = state.accents[beat] || 'normal';
+    const groove = grooveById(state.groove);
+
     if (accent === 'mute') {
-      // A silent beat also silences its subdivisions.
+      // A silent beat silences everything on it: subdivisions and drums too.
+    } else if (groove) {
+      playGrooveStep(groove, beat, index, time);
+      if (index === 0 && state.clickWithGroove) playClick(time, accent);
     } else if (index === 0) {
       playClick(time, accent);
     } else {
@@ -187,12 +479,18 @@
     if (index === 0) queue.push({ time, beat, count: beatCount++ });
   }
 
+  // A groove brings its own step grid; otherwise the chosen subdivision is used.
+  function currentOffsets() {
+    const groove = grooveById(state.groove);
+    return groove ? groove.offsets : subById(state.sub).offsets;
+  }
+
   function scheduler() {
     if (!state.running) return;
     const horizon = audioCtx.currentTime + SCHEDULE_AHEAD;
 
     for (;;) {
-      const offsets = subById(state.sub).offsets;
+      const offsets = currentOffsets();
       const beatLength = 60 / state.bpm;
 
       // Finished this beat's rhythm: move to the next beat.
@@ -200,6 +498,7 @@
         beatStartTime += beatLength;
         noteIndex = 0;
         currentBeat = (currentBeat + 1) % state.beats;
+        if (currentBeat === 0) barNumber += 1;
       }
 
       const time = beatStartTime + offsets[noteIndex] * beatLength;
@@ -276,6 +575,7 @@
     currentBeat = 0;
     noteIndex = 0;
     beatCount = 0;
+    barNumber = 0;
     queue.length = 0;
     lastBeat = null;
     beatStartTime = audioCtx.currentTime + 0.08;
@@ -339,8 +639,16 @@
       return dot;
     }));
     els.beatsValue.textContent = state.beats;
-    els.fewerBeats.disabled = state.beats <= MIN_BEATS;
-    els.moreBeats.disabled = state.beats >= MAX_BEATS;
+    updateLocks();
+  }
+
+  // While a groove plays, it decides the beats per bar and the rhythm.
+  function updateLocks() {
+    const locked = Boolean(grooveById(state.groove));
+    els.fewerBeats.disabled = locked || state.beats <= MIN_BEATS;
+    els.moreBeats.disabled = locked || state.beats >= MAX_BEATS;
+    for (const btn of els.subs.children) btn.disabled = locked;
+    els.subName.textContent = locked ? 'Set by the drum groove' : subById(state.sub).name;
   }
 
   function cycleAccent(i) {
@@ -444,18 +752,70 @@
       btn.setAttribute('aria-checked', String(selected));
       btn.tabIndex = selected ? 0 : -1;   // arrow keys move between tiles
     }
-    els.subName.textContent = sub.name;
+    updateLocks();
     saveSettings();
   }
 
-  els.subs.addEventListener('keydown', (e) => {
-    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
-    if (!step) return;
-    e.preventDefault();
-    const i = SUBDIVISIONS.findIndex((s) => s.id === state.sub);
-    const next = SUBDIVISIONS[(i + step + SUBDIVISIONS.length) % SUBDIVISIONS.length];
-    setSub(next.id);
-    els.subs.querySelector(`[data-sub="${next.id}"]`).focus();
+  // Arrow keys move the selection within a group of tiles.
+  function arrowKeys(container, attr, ids, current, select) {
+    container.addEventListener('keydown', (e) => {
+      const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+      if (!step) return;
+      e.preventDefault();
+      const list = ids();
+      const next = list[(list.indexOf(current()) + step + list.length) % list.length];
+      select(next);
+      container.querySelector(`[data-${attr}="${next}"]`).focus();
+    });
+  }
+
+  arrowKeys(els.subs, 'sub', () => SUBDIVISIONS.map((s) => s.id), () => state.sub, setSub);
+
+  /* ---------- Drum grooves ---------- */
+
+  const GROOVE_OPTIONS = [{ id: 'off', name: 'Off', about: 'Metronome click only' }, ...GROOVES];
+
+  function renderGrooves() {
+    els.grooves.replaceChildren(...GROOVE_OPTIONS.map((option) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'groove';
+      btn.dataset.groove = option.id;
+      btn.title = option.about;
+      btn.setAttribute('role', 'radio');
+      btn.textContent = option.name;
+      btn.addEventListener('click', () => setGroove(option.id));
+      return btn;
+    }));
+  }
+
+  function setGroove(id) {
+    const groove = grooveById(id);
+    state.groove = groove ? groove.id : 'off';
+    for (const btn of els.grooves.children) {
+      const selected = btn.dataset.groove === state.groove;
+      btn.setAttribute('aria-checked', String(selected));
+      btn.tabIndex = selected ? 0 : -1;
+    }
+    els.grooveName.textContent = groove ? groove.about : 'Metronome click only';
+    els.grooveClickRow.hidden = !groove;
+    els.grooveTempo.hidden = !(groove && groove.tempo);
+    if (groove && groove.tempo) els.grooveTempo.textContent = `Play at the suggested ${groove.tempo} bpm`;
+    if (groove) setBeats(groove.beats);
+    updateLocks();
+    saveSettings();
+  }
+
+  arrowKeys(els.grooves, 'groove', () => GROOVE_OPTIONS.map((g) => g.id), () => state.groove, setGroove);
+
+  els.grooveTempo.addEventListener('click', () => {
+    const groove = grooveById(state.groove);
+    if (groove && groove.tempo) setBpm(groove.tempo);
+  });
+
+  els.grooveClick.addEventListener('change', () => {
+    state.clickWithGroove = els.grooveClick.checked;
+    saveSettings();
   });
 
   function setVolume(v) {
@@ -498,8 +858,9 @@
 
   holdToRepeat(els.slower, () => setBpm(state.bpm - 1));
   holdToRepeat(els.faster, () => setBpm(state.bpm + 1));
-  holdToRepeat(els.fewerBeats, () => setBeats(state.beats - 1));
-  holdToRepeat(els.moreBeats, () => setBeats(state.beats + 1));
+  const beatsFree = () => !grooveById(state.groove);
+  holdToRepeat(els.fewerBeats, () => { if (beatsFree()) setBeats(state.beats - 1); });
+  holdToRepeat(els.moreBeats, () => { if (beatsFree()) setBeats(state.beats + 1); });
 
   els.slider.addEventListener('input', () => setBpm(Number(els.slider.value)));
   els.volume.addEventListener('input', () => setVolume(Number(els.volume.value) / 100));
@@ -508,7 +869,7 @@
 
   document.addEventListener('keydown', (e) => {
     if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
-    const onButton = e.target.tagName === 'BUTTON';
+    const onButton = e.target.tagName === 'BUTTON' || e.target.type === 'checkbox';
     const onSlider = e.target.type === 'range';
 
     if (e.code === 'Space' && !onButton) {
@@ -580,5 +941,8 @@
   renderBeats();
   renderSubdivisions();
   setSub(state.sub);
+  renderGrooves();
+  els.grooveClick.checked = state.clickWithGroove;
+  setGroove(state.groove);
   setVolume(state.volume);
 })();

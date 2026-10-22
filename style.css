@@ -372,7 +372,8 @@ input[type="range"]::-moz-range-thumb {
   gap: .4rem;
 }
 
-.sub {
+.sub,
+.groove {
   height: 3.25rem;
   padding: .25rem;
   border: 1.5px solid var(--line);
@@ -383,12 +384,83 @@ input[type="range"]::-moz-range-thumb {
   place-items: center;
   touch-action: manipulation;
 }
-.sub:hover { border-color: var(--muted); }
-.sub[aria-checked="true"] {
+.sub:hover,
+.groove:hover { border-color: var(--muted); }
+.sub[aria-checked="true"],
+.groove[aria-checked="true"] {
   background: var(--ink);
   border-color: var(--ink);
   color: var(--bg);
 }
+
+/* While a groove plays, the subdivision is set by the groove. */
+.sub:disabled {
+  cursor: not-allowed;
+  opacity: .35;
+}
+.sub:disabled:hover { border-color: var(--line); }
+
+.groove-about {
+  margin: -.35rem 0 0;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.grooves {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.75rem, 1fr));
+  gap: .4rem;
+}
+.groove {
+  height: auto;          /* longer names wrap onto two lines */
+  min-height: 2.75rem;
+  padding: .35rem .5rem;
+  line-height: 1.2;
+  font-size: .95rem;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  font-size: .95rem;
+  cursor: pointer;
+}
+.check[hidden] { display: none; }
+
+.groove-extras {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem 1rem;
+}
+/* Take no space when both controls are hidden (groove off). */
+.groove-extras:not(:has(> :not([hidden]))) { display: none; }
+
+.text-button {
+  padding: .2rem 0;
+  border: none;
+  background: none;
+  color: var(--brass-text);
+  font-size: .95rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
+.text-button[hidden] { display: none; }
+.check input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  accent-color: var(--brass);
+}
+
+.round:disabled {
+  cursor: not-allowed;
+  opacity: .35;
+}
+.round:disabled:active { transform: none; }
 
 .note-icon {
   height: 2.1rem;
