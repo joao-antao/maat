@@ -88,6 +88,20 @@
       },
     },
     {
+      // John Bonham on Led Zeppelin's "When the Levee Breaks" (1971): kick on
+      // "1 e" (the "e" soft), the "a" of 2 and the "and" of 3; snare on 2 and 4,
+      // each followed by a ghost note; eighths on a loose, sloshy hi-hat.
+      id: 'rock-bonham', name: 'Bonham’s rock', tempo: 70,
+      about: 'John Bonham’s heavy beat from Led Zeppelin’s “When the Levee Breaks”',
+      beats: 4, steps: 4, swing: 0.04,
+      parts: {
+        hat:   'X.x.|X.x.|X.x.|X.x.',
+        open:  '..g.|..g.|..g.|..g.',
+        snare: '....|Xg..|....|Xg..',
+        kick:  'Xx..|...X|..X.|....',
+      },
+    },
+    {
       id: 'pop', name: 'Pop', tempo: 108,
       about: 'Steady eighths with a pushed kick and an open hi-hat lift',
       beats: 4, steps: 4,
@@ -113,7 +127,7 @@
       // and third partials), the snare fills every middle partial with ghost
       // notes, the backbeat falls on 3, and the kick always lands together with a
       // hi-hat note. Bar 2 ends with an open hi-hat "shoop".
-      id: 'purdie', name: 'Purdie shuffle',
+      id: 'purdie', name: 'Purdie’s shuffle',
       about: 'Bernard Purdie’s half-time shuffle: backbeat on 3, ghost notes in between',
       beats: 4, steps: 3,
       parts: {
@@ -121,6 +135,20 @@
         open:  '...|...|...|...|...|...|...|..x',
         snare: '.g.|.g.|Xg.|.g.',
         kick:  'X..|..x|...|..x|X..|..x|...|X.x',
+      },
+    },
+    {
+      // Jeff Porcaro on Toto's "Rosanna" (1982): the Purdie-style half-time
+      // shuffle in the hands (hi-hat on the first and third triplet partials,
+      // whisper-quiet snare ghosts on the middle ones, backbeat on 3), with the
+      // Bo Diddley / son-clave rhythm on the bass drum across two bars.
+      id: 'porcaro', name: 'Porcaro’s shuffle', tempo: 82,
+      about: 'Half-time shuffle, with a Bo Diddley kick',
+      beats: 4, steps: 3,
+      parts: {
+        hat:   'X.x|X.x|X.x|X.x',
+        snare: '.g.|.g.|Xg.|.g.',
+        kick:  'X..|..x|...|x..|...|x..|x..|...',
       },
     },
     {
@@ -137,7 +165,7 @@
       // Sixteenths on the hi-hat with one hand, accenting the eighth notes; a linear
       // kick/cross-stick figure (never both on the same sixteenth); a barely-there
       // swing; and an open hi-hat at the end of the second bar.
-      id: 'funk-2bar', name: 'Funk 2-bar phrase', tempo: 78,
+      id: 'funk-sixteenths', name: 'Funk 16th\'s', tempo: 78,
       about: 'Linear kick and cross-stick under sixteenth hi-hats, over two bars',
       beats: 4, steps: 4, swing: 0.015,
       parts: {
