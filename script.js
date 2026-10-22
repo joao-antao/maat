@@ -108,6 +108,22 @@
       },
     },
     {
+      // Bernard Purdie's half-time shuffle (Steely Dan, "Babylon Sisters",
+      // "Home at Last"). On a triplet grid: the hi-hat plays the shuffle (first
+      // and third partials), the snare fills every middle partial with ghost
+      // notes, the backbeat falls on 3, and the kick always lands together with a
+      // hi-hat note. Bar 2 ends with an open hi-hat "shoop".
+      id: 'purdie', name: 'Purdie shuffle',
+      about: 'Bernard Purdie’s half-time shuffle: backbeat on 3, ghost notes in between',
+      beats: 4, steps: 3,
+      parts: {
+        hat:   'X.x|X.x|X.x|X.x|X.x|X.x|X.x|X..',
+        open:  '...|...|...|...|...|...|...|..x',
+        snare: '.g.|.g.|Xg.|.g.',
+        kick:  'X..|..x|...|..x|X..|..x|...|X.x',
+      },
+    },
+    {
       id: 'funk', name: 'Funk', about: 'Syncopated kick and ghost notes on the snare',
       beats: 4, steps: 4, swing: 0.02,
       parts: {
